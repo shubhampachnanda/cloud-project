@@ -1,0 +1,12 @@
+grafana:
+  enabled: true
+  adminPassword: admin
+  service:
+    type: NodePort
+  sidecar:
+    dashboards:
+      enabled: true
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false

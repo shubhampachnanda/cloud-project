@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-tenant1-to-tgi
+  namespace: shared-llm
+subjects:
+  - kind: ServiceAccount
+    name: tenant1-user
+    namespace: tenant1
+roleRef:
+  kind: Role
+  name: tgi-access
+  apiGroup: rbac.authorization.k8s.io

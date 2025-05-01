@@ -1,0 +1,18 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredtenantlabel
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredTenantLabel
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredtenantlabel
+
+        violation[{"msg": msg}] {
+          not input.review.object.metadata.labels["tenant"]
+          msg := "All resources must have a 'tenant' label"
+        }

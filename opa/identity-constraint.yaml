@@ -1,0 +1,13 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sTenantIdentity
+metadata:
+  name: enforce-tenant-identity
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - shared-llm   # ✅ allow unrestricted pods like TGI in this namespace

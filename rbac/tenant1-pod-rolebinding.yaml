@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: allow-tenant1-create-pod
+  namespace: tenant1
+subjects:
+  - kind: ServiceAccount
+    name: tenant1-user
+    namespace: tenant1
+roleRef:
+  kind: Role
+  name: pod-creator
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spoofpod
+  namespace: tenant1
+  labels:
+    tenant: tenant2   # ❌ Intentional violation
+spec:
+  containers:
+    - name: pause
+      image: k8s.gcr.io/pause

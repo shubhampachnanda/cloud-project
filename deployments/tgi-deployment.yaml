@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tgi-server
+  namespace: shared-llm
+  labels:
+    tenant: shared-llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tgi
+  template:
+    metadata:
+      labels:
+        app: tgi
+        tenant: shared-llm  # ✅ Required for Gatekeeper
+    spec:
+      containers:
+        - name: tgi
+          image: ghcr.io/huggingface/text-generation-inference:1.3.4
+          command: ["text-generation-launcher"]
+          args:
+            - "--model-id=openai-community/gpt2"
+            - "--max-total-tokens=1024"
+            - "--max-input-length=512"
+            - "--cors-allow-origin=http://127.0.0.1:5500"
+          ports:
+            - containerPort: 80
+          env:
+            - name: OTEL_EXPORTER_PROMETHEUS_PORT
+              value: "80"

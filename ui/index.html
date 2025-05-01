@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure LLM Prompt UI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 20px;
+      background-color: #f0f2f5;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    textarea {
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    .entry {
+      background: #ffffff;
+      border-left: 5px solid #007bff;
+      padding: 12px;
+      margin-top: 15px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .entry.tenant2 {
+      border-left-color: #28a745;
+    }
+
+    .tenant-label {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .prompt {
+      font-style: italic;
+      margin: 5px 0;
+    }
+
+    .response {
+      font-family: Consolas, monospace;
+      white-space: pre-wrap;
+      background-color: #f9f9f9;
+      padding: 8px;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    .timestamp {
+      font-size: 0.8em;
+      color: #666;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Send Prompt to GPT-2</h2>
+  <form id="prompt-form">
+    <label for="tenant">Tenant:</label>
+    <select id="tenant">
+      <option value="tenant1">Tenant 1</option>
+      <option value="tenant2">Tenant 2</option>
+    </select><br><br>
+    <textarea id="prompt" rows="5" cols="60" placeholder="Enter your prompt here..."></textarea><br><br>
+    <button type="submit">Send</button>
+  </form>
+
+  <h3>Responses:</h3>
+  <div id="response-container"></div>
+
+  <script>
+    document.getElementById('prompt-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const tenant = document.getElementById('tenant').value;
+      const prompt = document.getElementById('prompt').value.trim();
+      const container = document.getElementById('response-container');
+
+      if (!prompt) return;
+
+      try {
+        const res = await fetch('http://localhost:3000/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-tenant-id': tenant
+          },
+          body: JSON.stringify({ inputs: prompt })
+        });
+
+        const data = await res.json();
+        const timestamp = new Date().toLocaleString();
+
+        const entry = document.createElement('div');
+        entry.className = `entry ${tenant}`;
+
+        entry.innerHTML = `
+          <div class="tenant-label">👤 ${tenant.toUpperCase()}</div>
+          <div class="prompt">Prompt: ${prompt}</div>
+          <div class="response">${data.generated_text || JSON.stringify(data)}</div>
+          <div class="timestamp">⏰ ${timestamp}</div>
+        `;
+
+        container.prepend(entry);
+        document.getElementById('prompt').value = '';
+
+      } catch (err) {
+        alert("❌ Failed to reach proxy: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
